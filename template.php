@@ -43,7 +43,13 @@ if ( is_multisite() ) {
 							$input_value = 0;
 						}
 
-						$site_url = $site->domann . $site->path;
+						$current_blog_details = get_blog_details( array( 'blog_id' => $site->blog_id ) );
+
+						if ( ! empty( $current_blog_details ) && isset( $current_blog_details->blogname ) ) {
+							$site_url = $current_blog_details->blogname;
+						} else {
+							$site_url = $site->domain . $site->path;
+						}
 					}
 					?>
 				<tr valign="top">
