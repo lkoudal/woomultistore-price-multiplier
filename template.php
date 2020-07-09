@@ -54,7 +54,7 @@ if ( is_multisite() ) {
 					?>
 				<tr valign="top">
 					<th scope="row">
-						<input min='0' max='100' type='number' name='<?php echo $input_name; ?>' value='<?php echo $input_value; ?>' />
+						<input min='0' max='10000' type='number' name='<?php echo $input_name; ?>' value='<?php echo $input_value; ?>' />
 					</th>
 					<td>
 						<label> <?php echo esc_html( $site_url ); ?></label>
