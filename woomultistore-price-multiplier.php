@@ -28,12 +28,17 @@ final class WOOMULTISTORE_PRICE_MULTIPLIER {
 	 * @return void
 	 */
 	public function init() {
-		if ( get_option( 'woonet_network_type' ) == 'master' ) {
-			add_action( 'admin_menu', array( $this, 'add_submenu' ), PHP_INT_MAX );
+		if ( is_multisite() ) {
+			add_action( 'network_admin_menu', array( $this, 'add_submenu' ), PHP_INT_MAX );
+			add_action( 'WOO_MSTORE_admin_product/slave_product_updated', array( $this, 'multiply_price' ), PHP_INT_MAX, 1 );
 		} else {
-			// hook on child site to save options.
-			add_action( 'WOO_MSTORE_SYNC/CUSTOM/price_multiplier_settings', array( $this, 'save_price_multiplier_settings' ), PHP_INT_MAX );
-			add_action( 'WOO_MSTORE_SYNC/sync_child/complete', array( $this, 'multiply_price' ), PHP_INT_MAX, 3 );
+			if ( get_option( 'woonet_network_type' ) == 'master' ) {
+				add_action( 'admin_menu', array( $this, 'add_submenu' ), PHP_INT_MAX );
+			} else {
+				// hook on child site to save options.
+				add_action( 'WOO_MSTORE_SYNC/CUSTOM/price_multiplier_settings', array( $this, 'save_price_multiplier_settings' ), PHP_INT_MAX );
+				add_action( 'WOO_MSTORE_SYNC/sync_child/complete', array( $this, 'multiply_price' ), PHP_INT_MAX, 3 );
+			}
 		}
 	}
 
@@ -71,15 +76,19 @@ final class WOOMULTISTORE_PRICE_MULTIPLIER {
 	 */
 	public function submenu_hook() {
 		if ( ! empty( $_POST['mstore_price_multiplier_submit'] ) ) {
-			update_option( 'woonet_price_multiplier', $_POST['woomulti_price_multiplier'] );
+			if ( is_multisite() ) {
+				update_site_option( 'woonet_price_multiplier', $_POST['woomulti_price_multiplier'] );
+			} else {
+				update_option( 'woonet_price_multiplier', $_POST['woomulti_price_multiplier'] );
 
-			$data = array(
-				'payload_contents' => $_POST['woomulti_price_multiplier'],
-				'payload_type'     => 'price_multiplier_settings',
-			);
+				$data = array(
+					'payload_contents' => $_POST['woomulti_price_multiplier'],
+					'payload_type'     => 'price_multiplier_settings',
+				);
 
-			$_engine = new WOO_MSTORE_SINGLE_NETWORK_SYNC_ENGINE();
-			$_engine->request_child( 'woomulti_custom_payload', $data );
+				$_engine = new WOO_MSTORE_SINGLE_NETWORK_SYNC_ENGINE();
+				$_engine->request_child( 'woomulti_custom_payload', $data );
+			}
 		}
 	}
 
@@ -99,10 +108,27 @@ final class WOOMULTISTORE_PRICE_MULTIPLIER {
 	 *
 	 * @return void
 	 */
-	public function multiply_price( $product_id, $parent_id, $product ) {
-		$wc_product            = wc_get_product( $product_id );
-		$price_settings        = get_option( 'woonet_price_multiplier' );
-		$woonet_master_connect = get_option( 'woonet_master_connect' );
+	public function multiply_price( $product_id, $parent_id = null, $product = null ) {
+
+		if ( is_multisite() ) {
+			/**
+			 * If multisite product data with array is passed instead of $product_id
+			 * We neeed to get the product ID from the slave product data.
+			 */
+			$product_id = $product_id['slave_product']->get_id();
+		}
+
+		$wc_product = wc_get_product( $product_id );
+
+		if ( is_multisite() ) {
+			$price_settings        = get_site_option( 'woonet_price_multiplier' );
+			$woonet_master_connect = array(
+				'uuid' => get_current_blog_id(),
+			);
+		} else {
+			$price_settings        = get_option( 'woonet_price_multiplier' );
+			$woonet_master_connect = get_option( 'woonet_master_connect' );
+		}
 
 		if ( $wc_product && ! empty( $price_settings [ $woonet_master_connect['uuid'] ] ) ) {
 			if ( $price_settings [ $woonet_master_connect['uuid'] ] > 0 ) {
