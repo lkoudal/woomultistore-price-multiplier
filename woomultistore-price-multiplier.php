@@ -4,7 +4,7 @@
  * Plugin URI: https://woomultistore.com/
  * Description: An addon for WooMultistore to multiply the price by a given percentage.
  * Author: Lykke Media AS
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author URI: https://woomultistore.com/
  */
 

@@ -25,7 +25,7 @@ if ( is_multisite() ) {
 				<?php
 				foreach ( $sites as $site ) :
 					if ( ! is_multisite() ) {
-						$input_name = "woomulti_price_multiplier[ {$site['uuid']} ]";
+						$input_name = "woomulti_price_multiplier[{$site['uuid']}]";
 
 						if ( isset( $price_multiplier[ $site['uuid'] ] ) ) {
 							$input_value = $price_multiplier[ $site['uuid'] ];

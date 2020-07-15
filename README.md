@@ -7,3 +7,6 @@ Install the addon on all of your sites for regular WordPress version and for Wor
 
 # Notice
 This addon is provided 'as is'. No official support can be clamied agaist this addon.
+
+# Latest Stable Release
+Version  1.0.2
