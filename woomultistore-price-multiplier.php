@@ -131,11 +131,11 @@ final class WOOMULTISTORE_PRICE_MULTIPLIER {
 		}
 
 		if ( $wc_product && ! empty( $price_settings [ $woonet_master_connect['uuid'] ] ) ) {
-			if ( $price_settings [ $woonet_master_connect['uuid'] ] > 0 ) {
-				$multiplier = (int) $price_settings [ $woonet_master_connect['uuid'] ] / 100;
-			} else {
-				$multiplier = 1;
+			if ( $price_settings [ $woonet_master_connect['uuid'] ] == 0 || empty( $price_settings [ $woonet_master_connect['uuid'] ] ) ) {
+				return;
 			}
+
+			$multiplier = (int) $price_settings [ $woonet_master_connect['uuid'] ] / 100;
 
 			if ( $wc_product->get_regular_price() > 0 ) {
 				$wc_product->set_regular_price( $wc_product->get_regular_price() + $wc_product->get_regular_price() * $multiplier );
