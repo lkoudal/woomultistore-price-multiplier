@@ -1,4 +1,4 @@
-# woomultistore-price-multiplier
+# WooMultistore Price Multiplier
 WooMultistore Addon to multiply the price with a certain percentage. This addon works both for the regular WordPress version of our plugin and also the multisite version.
 
 
